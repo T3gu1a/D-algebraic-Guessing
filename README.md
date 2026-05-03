@@ -38,4 +38,3 @@ with(DalgGuessing);
 ## Author
 
 - [Bertrand Teguia Tabuguia](https://bertrandteguia.com), [Email Me](mailto:email@bertrandteguia.com)
-- licence: GNU General Public Licence v3.0.
