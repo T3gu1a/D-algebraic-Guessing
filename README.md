@@ -4,7 +4,7 @@
 
 > «The result of the mathematician's creative work is demonstrative reasoning, a proof, but the proof is discovered by plausible reasoning, by GUESSING.» — George Pólya
 
-![Analogy](images/Analogy.png)
+![Analogy](/images/Analogy.png)
 *The young fisherman caught a 'necklace' of consecutive terms of a sequence, providing strong evidence that this sequence belongs to a class of objects defined by its 'fishing rod' (being D-algebraic).*
 
 ## Introduction
