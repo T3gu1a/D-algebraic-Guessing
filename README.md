@@ -6,16 +6,16 @@
 
 This GitHub page is devoted to the Maple package **DalgGuessing**.
 
-DalgGuessing is a standalone package for the guessing software from the Maple package [NLDE](https://github.com/T3gu1a/D-algebraic-functions).
+DalgGuessing is a standalone package for the guessing software from the Maple package [NLDE](https://github.com/T3gu1a/D-algebraic-functions) dedicated to operations with D-algebraic funtions and sequences.
 The package currently exports two commands for recovering D-algebraic functions from the first few coefficients of their power series. These are:
 
-- ``DalgFunGuess`` :
-- ``modDalgFunGuess``:
+- ``DalgFunGuess`` : guess an algebraic differential equation in characteristic zero from a list of initial coefficients of the D-algebraic function sought.
+- ``modDalgFunGuess``: guess an algebraic differential equation over $\mathbb{Z} /m \mathbb{Z}$ from a list of initial coefficients of the D-algebraic function sought. Here $m$ is a positive integer (usually prime) chosen by the user.
 
 
 ## Requirements
 
-A recent version of [Maple](https://www.maplesoft.com/) (version $\geq$ 2018).
+A recent version of [Maple](https://www.maplesoft.com/) (version $\geq$ 2019).
 
 ## Installation
 
@@ -37,5 +37,4 @@ with(DalgGuessing);
 ```
 ## Author
 
-- [Bertrand Teguia Tabuguia](https://bertrandteguia.com), [Email Me](mailto:yourname@example.com)
-- licence: GNU General Public Licence v3.0.
+- [Bertrand Teguia Tabuguia](https://bertrandteguia.com), [Email Me](mailto:email@bertrandteguia.com)
