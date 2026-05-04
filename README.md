@@ -20,7 +20,7 @@ The package currently exports two commands for recovering D-algebraic functions 
 
 ## Requirements
 
-A recent version of [Maple](https://www.maplesoft.com/) (version $\geq$ 2019).
+A recent version of [Maple](https://www.maplesoft.com/) (version $\geq$ 2019), best for versions $\geq 2023$.
 
 ## Installation
 
