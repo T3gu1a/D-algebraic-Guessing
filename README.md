@@ -50,7 +50,7 @@ with(DalgGuessing);
 - ``degPoly``: the maximum degree of the polynomial coefficients, with a default value of $2$.
 - ``devars``: the dependent variable, with a default value of $y(x)$.
 - ``startfromord``: the starting order of the search, with a default value of $0$.
-- ``linsolver``: the method use to solve the underlying linear system with default value AlgebraicFunction for Maple's `SolveTools:-Linear`. The option `HardSystem` is an alternative which is more effective for larger systems or systems with many symbolic variables.
+- ``linsolver``: the method used to solve the underlying linear system with default value AlgebraicFunction for Maple's `SolveTools:-Linear`. The option `HardSystem` is an alternative which is more effective for larger systems or systems with many symbolic variables.
 - ``inputConstants``: a set of parameters or symbolic variables appearing in the initial terms in `L`. Default value `{}`.
 - ``allPolyDeg``: a boolean variable with a default value of `false`. When set to `true`, it prevents the code from stopping when it reaches the lowest order where the data in `L` becomes insufficient. Instead, it fixes that order and continues the search by allowing polynomial coefficients with degrees strictly less than `degPoly` to reduce the number of unknowns.
 - ``termsOfDegPoly``: a positive integer representing the number of polynomial coefficients of degree `degPoly` to include if the data in `L` is insufficient for the general search performed when `allPolyDeg=true`. This can be used to reduce the order enough to allow the search to proceed. This is particularly useful when `allPolyDeg=false` fails to initiate any computation.
