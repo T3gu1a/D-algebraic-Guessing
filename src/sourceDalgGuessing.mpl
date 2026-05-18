@@ -977,8 +977,8 @@ modFFixedOrdDegFunGuess:= proc(Lf::algebraic,
 				N::nonnegint,
 				y::name,
 				x::name,
-			  modulus::posint,
 		     maxIteration::Or(posint,identical(infinity)),
+		          modulus::posint,
 		   inputConstants::set(name),
 			 sparsity::fraction,
 			       $)::Or(identical(FAIL),`=`);
@@ -1004,7 +1004,7 @@ modFFixedOrdDegFunGuess:= proc(Lf::algebraic,
 				ADE:=add(add(unkV[(degPoly+1)*(j-1)+i+1]*x^i*deltakdiff(Y,x,degADE,j),i=0..degPoly),j=1..N);
 				polEq:=expand(eval(ADE,Y=Lf)) mod modulus;
 				unkV:=remove(t->t=0,unkV);
-				Eq:=PolynomialTools:-CoefficientList(polEq,x)[1..numelems(unkV)]; #[seq(coeff(polEq,x,i),i=0..M-1)];
+				Eq:=PolynomialTools:-CoefficientList(polEq,x); #[seq(coeff(polEq,x,i),i=0..M-1)];
 				Meqs, beqs := LinearAlgebra:-GenerateMatrix(Eq,unkV);
 				S:= try convert(Linsolve(Meqs,beqs) mod modulus, list) catch : NULL end try;
 				S:= ifelse(type(S,list(algebraic)),S,NULL);
@@ -1050,7 +1050,7 @@ modFFixedOrdDegFunGuess:= proc(Lf::algebraic,
 				ADE:=add(add(unkV[(degPoly+1)*(j-1)+i+1]*x^i*deltakdiff(Y,x,degADE,j),i=0..degPoly),j=1..N);
 				polEq:=expand(eval(ADE,Y=Lf)) mod modulus;
 				unkV:=remove(t->t=0,unkV);
-				Eq:=PolynomialTools:-CoefficientList(polEq,x)[1..numelems(unkV)]; #[seq(coeff(polEq,x,i),i=0..M-1)];
+				Eq:=PolynomialTools:-CoefficientList(polEq,x); #[seq(coeff(polEq,x,i),i=0..M-1)];
 				Meqs, beqs := LinearAlgebra:-GenerateMatrix(Eq,unkV);
 				S:= try convert(Linsolve(Meqs,beqs) mod modulus, list) catch : NULL end try;
 				S:= ifelse(type(S,list(algebraic)),S,NULL);
