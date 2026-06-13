@@ -8,7 +8,7 @@ export DalgFunGuess, modDalgFunGuess;
 
 local ordertoktuple, polcheckSol, prevlistnumber, FFixedOrdDegFunGuess, FFixedOrdDegFunGuess2, ADEtoRE, modcheckSol, checkSol,
       deltakdiff, GenMaxlistnumber, MultinomialCount, UnrankMultiset, ADECauchyprod, poch, ADEtermToREterm, modpolcheckSol,FixedOrdDegFunGuess,
-      modFixedOrdDegFunGuess, modFFixedOrdDegFunGuess, modFFixedOrdDegFunGuess2;
+      modFixedOrdDegFunGuess, modFFixedOrdDegFunGuess, modFFixedOrdDegFunGuess2,LetGenerateMatrix,LetGenerateIntMatrix;
 
 
 DalgFunGuess:= proc(L::list,
@@ -66,7 +66,7 @@ DalgFunGuess:= proc(L::list,
 			A:=a(n);
 			Sinit:=[seq(a(i-1)=L[i],i=1..nL)];
 		else
-			Lf:=PolynomialTools:-FromCoefficientList(L,x)
+			Lf:=PolynomialTools:-FromCoefficientList(L,x) #add(L[i+1]*x^i,i=0..nL-1)
 		end if;
 		if M > nL then
 			if approach=recurrence then
@@ -96,12 +96,12 @@ DalgFunGuess:= proc(L::list,
 			NegInd:=map(v->v=0,[op(indets(Eq,a(negint)))]);
 			Eq:=subs(NegInd,Eq);
 		else	
-			polEq:=expand(eval(ADE,Y=Lf));
+			polEq:=eval(ADE,Y=Lf);
 			Eq:=PolynomialTools:-CoefficientList(polEq,x)[1..M]; #[seq(coeff(polEq,x,i),i=0..M-1)] -- not efficient
 		end if;
 		#S:=try op(solve(Eq,V)) catch : NULL  end try;
 		if linsolver=HardSystem then
-			Meqs, beqs := ifelse(approach=recurrence,LinearAlgebra:-GenerateMatrix(remove(has,Eq,a), V),LinearAlgebra:-GenerateMatrix(Eq, V));
+			Meqs, beqs := ifelse(approach=recurrence,LetGenerateMatrix(remove(has,Eq,a), V, M), LetGenerateMatrix(Eq, V, M));
 			S:=try LinearAlgebra:-LinearSolve(Meqs, beqs) catch: NULL end try;
 			S:=ifelse(S<>NULL,{seq(V[i] = S[i], i = 1 .. numelems(V))},NULL);
 		else
@@ -146,13 +146,13 @@ DalgFunGuess:= proc(L::list,
 				NegInd:=map(v->v=0,[op(indets(Eq,a(negint)))]);
 				Eq:=subs(NegInd,Eq);
 			else
-				NpolEq:=expand(eval(NDE,Y=Lf));
+				NpolEq:=eval(NDE,Y=Lf);
 				polEq:=polEq+NpolEq;
 				Eq:=PolynomialTools:-CoefficientList(polEq,x)[1..M+degPoly+1]
 			end if;
 			M:=M+degPoly+1;
 			if linsolver=HardSystem then
-				Meqs, beqs := LinearAlgebra:-GenerateMatrix(Eq, V);
+				Meqs, beqs := LetGenerateMatrix(Eq, V, M);
 				S:=try LinearAlgebra:-LinearSolve(Meqs, beqs) catch: NULL end try;
 				S:=ifelse(S<>NULL,{seq(V[i] = S[i], i = 1 .. numelems(V))},NULL);
 			else
@@ -281,7 +281,7 @@ modDalgFunGuess:= proc(L::list,
 			A:=a(n);
 			Sinit:=[seq(a(i-1)=Terms[i],i=1..nL)]
 		else
-			Lf:=PolynomialTools:-FromCoefficientList(Terms,x)
+			Lf:=PolynomialTools:-FromCoefficientList(Terms,x) #add(Terms[i+1]*x^i,i=0..nL-1)
 		end if;
 		#underdetermined system
 		if M > nL then
@@ -316,13 +316,14 @@ modDalgFunGuess:= proc(L::list,
 			Aindets:=[seq(Aindets[j]=cat(a,j),j=1..numelems(Aindets))];
 			Eq:=subs(Aindets,Eq)
 		else
-			polEq:=expand(eval(ADE,Y=Lf) mod modulus) mod modulus;
+			polEq:= eval(ADE,Y=Lf) mod modulus;
 			Eq:=PolynomialTools:-CoefficientList(polEq,x)[1..M] #[seq(coeff(polEq,x,i),i=0..M-1)]
 		end if;
 		#solving the linear system
-		Meqs, beqs := LinearAlgebra:-GenerateMatrix(Eq,V);
+		#Meqs, beqs := LinearAlgebra:-GenerateMatrix(Eq,V); -- too slow
+		Meqs, beqs := LetGenerateIntMatrix(Eq,V,M,modulus);
 		S:= try convert(Linsolve(Meqs,beqs) mod modulus, list) catch : NULL end try;
-		#S:= try LinearAlgebra:-LinearSolve(Meqs, beqs) mod modulus catch : NULL end try;
+		#S:= try LinearAlgebra:-LinearSolve(Meqs, beqs) mod modulus catch : NULL end try;  --- not appropriate for this 
 		S:= ifelse(type(S,list(algebraic)),S,NULL);
 		#S:= ifelse(S<>NULL,convert(S,list),NULL);
 		#S:=try msolve({op(Eq)},modulus) catch : NULL  end try;
@@ -368,13 +369,14 @@ modDalgFunGuess:= proc(L::list,
 				Aindets:=[seq(Aindets[j]=cat(a,j),j=1..numelems(Aindets))];
 				Eq:=subs(Aindets,Eq)
 			else 
-				NpolEq:=expand(eval(NDE,Y=Lf) mod modulus) mod modulus;
+				NpolEq:=eval(NDE,Y=Lf) mod modulus;
 				polEq:=polEq+NpolEq mod modulus;
 				Eq:=PolynomialTools:-CoefficientList(polEq,x)[1..M+degPoly+1] #[seq(coeff(polEq,x,i),i=0..M+degPoly+1)]
 			end if;
 			M:=M+degPoly+1;
 			#solving the linear system
-			Meqs, beqs := LinearAlgebra:-GenerateMatrix(Eq,V);
+			#Meqs, beqs := LinearAlgebra:-GenerateMatrix(Eq,V);
+			Meqs, beqs := LetGenerateIntMatrix(Eq,V,M,modulus);
 			S:= try convert(Linsolve(Meqs,beqs) mod modulus, list) catch : NULL end try;
 			S:= ifelse(type(S,list(algebraic)),S,NULL);
 			#S:= try LinearAlgebra:-LinearSolve(Meqs, beqs) mod modulus catch : NULL end try;
@@ -476,10 +478,10 @@ FFixedOrdDegFunGuess2:= proc(  Lf::algebraic,
 					V:=[seq(c[i],i=0..M-1)];
 					ADE:=add(add(V[add(degCoeffs[m]+1,m=1..j-1)+i+1]*x^i*deltakdiff(Y,x,degADE,j)
 									  ,i=0..degCoeffs[j]),j=1..N);
-					polEq:=expand(eval(ADE,Y=Lf));
+					polEq:=eval(ADE,Y=Lf);
 					Eq:=PolynomialTools:-CoefficientList(polEq,x)[1..M]; 
 					if linsolver=HardSystem then
-						Meqs, beqs := LinearAlgebra:-GenerateMatrix(Eq, V);
+						Meqs, beqs := LetGenerateIntMatrix(Eq, V, M, modulus);
 						S:=try LinearAlgebra:-LinearSolve(Meqs, beqs) catch: NULL end try;
 						S:=ifelse(S<>NULL,{seq(V[i] = S[i], i = 1 .. M)},NULL)
 					else
@@ -504,9 +506,9 @@ FFixedOrdDegFunGuess2:= proc(  Lf::algebraic,
 					V:=[seq(c[i],i=0..M-1)];
 					ADE:=add(add(V[add(degCoeffs[m]+1,m=1..j-1)+i+1]*x^i*deltakdiff(Y,x,degADE,j)
 									  ,i=0..degCoeffs[j]),j=1..N);
-					polEq:=expand(eval(ADE,Y=Lf));
+					polEq:=eval(ADE,Y=Lf);
 					Eq:=PolynomialTools:-CoefficientList(polEq,x)[1..M]; 
-					Meqs, beqs := LinearAlgebra:-GenerateMatrix(Eq, V);
+					Meqs, beqs := LetGenerateMatrix(Eq, V, M);
 					S:=try LinearAlgebra:-LinearSolve(Meqs, beqs) catch: NULL end try;
 					S:=ifelse(S<>NULL,[seq(V[i] = S[i], i = 1 .. numelems(V))],NULL);
 					if S<>NULL then
@@ -572,11 +574,11 @@ FFixedOrdDegFunGuess:= proc(   Lf::algebraic,
 				zzV:=map(t->t=0,zzV);
 				unkV:=subs(zzV,V);
 				ADE:=add(add(unkV[(degPoly+1)*(j-1)+i+1]*x^i*deltakdiff(Y,x,degADE,j),i=0..degPoly),j=1..N);
-				polEq:=expand(eval(ADE,Y=Lf));
+				polEq:=eval(ADE,Y=Lf);
 				unkV:=remove(t->t=0,unkV);
 				Eq:=PolynomialTools:-CoefficientList(polEq,x)[1..numelems(unkV)]; 
 				if linsolver=HardSystem then
-					Meqs, beqs := LinearAlgebra:-GenerateMatrix(Eq, unkV);
+					Meqs, beqs := LetGenerateMatrix(Eq, unkV, numelems(unkV));
 					S:=try LinearAlgebra:-LinearSolve(Meqs, beqs) catch: NULL end try;
 					S:=ifelse(S<>NULL,{seq(unkV[i] = S[i], i = 1 .. numelems(unkV))},NULL)
 				else
@@ -621,10 +623,10 @@ FFixedOrdDegFunGuess:= proc(   Lf::algebraic,
 				zzV:=map(t->t=0,zzV);
 				unkV:=subs(zzV,V);
 				ADE:=add(add(unkV[(degPoly+1)*(j-1)+i+1]*x^i*deltakdiff(Y,x,degADE,j),i=0..degPoly),j=1..N);
-				polEq:=expand(eval(ADE,Y=Lf));
+				polEq:=eval(ADE,Y=Lf);
 				unkV:=remove(t->t=0,unkV);
-				Eq:=PolynomialTools:-CoefficientList(polEq,x)[1..numelems(unkV)]; 
-				Meqs, beqs := LinearAlgebra:-GenerateMatrix(Eq, unkV);
+				Eq:=PolynomialTools:-CoefficientList(polEq,x)[1..numelems(unkV)];#[1..nL-degPoly]; 
+				Meqs, beqs := LetGenerateMatrix(Eq, unkV, numelems(unkV));
 				S:=try LinearAlgebra:-LinearSolve(Meqs, beqs) catch: NULL end try;
 				S:=ifelse(S<>NULL,[seq(unkV[i] = S[i], i = 1 .. numelems(unkV))],NULL);
 				if S<>NULL then
@@ -699,7 +701,7 @@ FixedOrdDegFunGuess:= proc(Sinit::list,
 					NegInd:=map(v->v=0,[op(indets(Eq,a(negint)))]);
 					Eq:=subs(NegInd,Eq);
 					if linsolver=HardSystem then
-						Meqs, beqs := LinearAlgebra:-GenerateMatrix(Eq, V);
+						Meqs, beqs := LetGenerateMatrix(Eq, V, M);
 						S:=try LinearAlgebra:-LinearSolve(Meqs, beqs) catch: NULL end try;
 						S:=ifelse(S<>NULL,{seq(V[i] = S[i], i = 1 .. M)},NULL)
 					else
@@ -729,7 +731,7 @@ FixedOrdDegFunGuess:= proc(Sinit::list,
 					Eq:=[seq(subs(Sinit,eval(RE,[n=i,Sum=add])),i=0..M-1)];
 					NegInd:=map(v->v=0,[op(indets(Eq,a(negint)))]);
 					Eq:=subs(NegInd,Eq);
-					Meqs, beqs := LinearAlgebra:-GenerateMatrix(Eq, V);
+					Meqs, beqs := LetGenerateMatrix(Eq, V, M);
 					S:=try LinearAlgebra:-LinearSolve(Meqs, beqs) catch: NULL end try;
 					S:=ifelse(S<>NULL,[seq(V[i] = S[i], i = 1 .. numelems(V))],NULL);
 					#S:=SolveTools:-Linear(Eq,V,method=linsolver);
@@ -810,7 +812,7 @@ modFixedOrdDegFunGuess:= proc(Sinit::list,
 					Aindets:=[op(indets(Eq,a('integer')))];
 					Aindets:=[seq(Aindets[j]=cat(a,j),j=1..numelems(Aindets))];
 					Eq:=subs(Aindets,Eq);
-					Meqs, beqs := LinearAlgebra:-GenerateMatrix(Eq,V);
+					Meqs, beqs := LetGenerateIntMatrix(Eq, V, M, modulus);
 					S:= try convert(Linsolve(Meqs,beqs) mod modulus, list) catch : NULL end try;
 					S:= ifelse(type(S,list(algebraic)),S,NULL);
 					if S<>NULL then
@@ -841,7 +843,7 @@ modFixedOrdDegFunGuess:= proc(Sinit::list,
 					Aindets:=[op(indets(Eq,a('integer')))];
 					Aindets:=[seq(Aindets[j]=cat(a,j),j=1..numelems(Aindets))];
 					Eq:=subs(Aindets,Eq);
-					Meqs, beqs := LinearAlgebra:-GenerateMatrix(Eq,V);
+					Meqs, beqs := LetGenerateIntMatrix(Eq,V,M,modulus);
 					S:= try convert(Linsolve(Meqs,beqs) mod modulus, list) catch : NULL end try;
 					S:= ifelse(type(S,list(algebraic)),S,NULL);
 					if S<>NULL then
@@ -908,9 +910,9 @@ modFFixedOrdDegFunGuess2:= proc(Lf::algebraic,
 					V:=[seq(c[i],i=0..M-1)];
 					ADE:=add(add(V[add(degCoeffs[m]+1,m=1..j-1)+i+1]*x^i*deltakdiff(Y,x,degADE,j)
 									  ,i=0..degCoeffs[j]),j=1..N);
-					polEq:=expand(eval(ADE,Y=Lf) mod modulus) mod modulus;
+					polEq:=eval(ADE,Y=Lf) mod modulus;
 					Eq:=PolynomialTools:-CoefficientList(polEq,x)[1..M]; 
-					Meqs, beqs := LinearAlgebra:-GenerateMatrix(Eq,V);
+					Meqs, beqs := LetGenerateIntMatrix(Eq,V,M,modulus);
 					S:= try convert(Linsolve(Meqs,beqs) mod modulus, list) catch : NULL end try;
 					S:= ifelse(type(S,list(algebraic)),S,NULL);
 					if S<>NULL then
@@ -933,9 +935,9 @@ modFFixedOrdDegFunGuess2:= proc(Lf::algebraic,
 					V:=[seq(c[i],i=0..M-1)];
 					ADE:=add(add(V[add(degCoeffs[m]+1,m=1..j-1)+i+1]*x^i*deltakdiff(Y,x,degADE,j)
 									  ,i=0..degCoeffs[j]),j=1..N);
-					polEq:=expand(eval(ADE,Y=Lf) mod modulus) mod modulus;
+					polEq:=eval(ADE,Y=Lf) mod modulus;
 					Eq:=PolynomialTools:-CoefficientList(polEq,x)[1..M]; #[seq(coeff(polEq,x,i),i=0..M-1)];
-					Meqs, beqs := LinearAlgebra:-GenerateMatrix(Eq,V);
+					Meqs, beqs := LetGenerateIntMatrix(Eq,V,M,modulus);
 					S:= try convert(Linsolve(Meqs,beqs) mod modulus, list) catch : NULL end try;
 					S:= ifelse(type(S,list(algebraic)),S,NULL);
 					if S<>NULL then
@@ -1002,10 +1004,10 @@ modFFixedOrdDegFunGuess:= proc(Lf::algebraic,
 				zzV:=map(t->t=0,zzV);
 				unkV:=subs(zzV,V);
 				ADE:=add(add(unkV[(degPoly+1)*(j-1)+i+1]*x^i*deltakdiff(Y,x,degADE,j),i=0..degPoly),j=1..N);
-				polEq:=expand(eval(ADE,Y=Lf)) mod modulus;
+				polEq:=eval(ADE,Y=Lf) mod modulus;
 				unkV:=remove(t->t=0,unkV);
-				Eq:=PolynomialTools:-CoefficientList(polEq,x); #[seq(coeff(polEq,x,i),i=0..M-1)];
-				Meqs, beqs := LinearAlgebra:-GenerateMatrix(Eq,unkV);
+				Eq:=PolynomialTools:-CoefficientList(polEq,x);         #[1..numelems(unkV)];[seq(coeff(polEq,x,i),i=0..M-1)];
+				Meqs, beqs := LetGenerateIntMatrix(Eq,unkV,numelems(unkV),modulus);
 				S:= try convert(Linsolve(Meqs,beqs) mod modulus, list) catch : NULL end try;
 				S:= ifelse(type(S,list(algebraic)),S,NULL);
 				if S<>NULL then
@@ -1048,10 +1050,10 @@ modFFixedOrdDegFunGuess:= proc(Lf::algebraic,
 				zzV:=map(t->t=0,zzV);
 				unkV:=subs(zzV,V);
 				ADE:=add(add(unkV[(degPoly+1)*(j-1)+i+1]*x^i*deltakdiff(Y,x,degADE,j),i=0..degPoly),j=1..N);
-				polEq:=expand(eval(ADE,Y=Lf)) mod modulus;
+				polEq:=eval(ADE,Y=Lf) mod modulus;
 				unkV:=remove(t->t=0,unkV);
-				Eq:=PolynomialTools:-CoefficientList(polEq,x); #[seq(coeff(polEq,x,i),i=0..M-1)];
-				Meqs, beqs := LinearAlgebra:-GenerateMatrix(Eq,unkV);
+				Eq:=PolynomialTools:-CoefficientList(polEq,x);  #[1..numelems(unkV)]; [seq(coeff(polEq,x,i),i=0..M-1)];
+				Meqs, beqs := LetGenerateIntMatrix(Eq,unkV,numelems(unkV),modulus);
 				S:= try convert(Linsolve(Meqs,beqs) mod modulus, list) catch : NULL end try;
 				S:= ifelse(type(S,list(algebraic)),S,NULL);
 				if S<>NULL then
@@ -1089,7 +1091,7 @@ ordertoktuple := proc(k::posint,n::nonnegint) option remember;
 		local m, im, Tkn, j;
 		option `Copyright (c) 2022 Bertrand Teguia T.`;
 		if n=0 then 
-		    return [seq(0,j=1..k)]
+		    return [seq(0,j=1..k)]; #Array(1..k, datatype = integer)
 		else   
 		    Tkn:=ordertoktuple(k,n-1);
 		    m:=min(Tkn);
@@ -1098,7 +1100,7 @@ ordertoktuple := proc(k::posint,n::nonnegint) option remember;
 		    if im=k then
 			return Tkn
 		    else
-			return [op(Tkn[1..im]),seq(0,j=im+1..k)]
+			return [op(Tkn[1..im]),seq(0,j=im+1..k)] #ArrayTools:-Extend(Tkn[1..im],Array(1..k-im,datatype=integer)) 
 		    end if     
 		end if    
 	end proc:
@@ -1108,6 +1110,20 @@ deltakdiff := proc(expr,z::name,k::posint:=2,n::nonnegint:=1,$)
 		option `Copyright (c) 2022 Bertrand Teguia T.`;
 		tuple:= select(type,ordertoktuple(k,n)-~1,nonnegint);
 		return mul(map(d-> diff(expr,[seq(z,1..d)]), tuple))
+	end proc:
+
+LetGenerateIntMatrix := proc(Eq::list,V::list,n::integer,m::posint)
+		local A, B,i,j;
+		A := Matrix(n, n, [ seq([ seq( coeff(Eq[i], V[j]) mod m, j=1..n) ], i=1..n) ], datatype=integer);
+		B := Vector(n, [ seq( (-subs(map(v -> v=0, V), Eq[i])) mod m, i=1..n) ],datatype=integer);
+		return A,B
+	end proc:
+	
+LetGenerateMatrix := proc(Eq::list,V::list,n::integer)
+		local A, B,i,j;
+		A := Matrix(n, n, [ seq([ seq( coeff(Eq[i], V[j]), j=1..n) ], i=1..n) ]);
+		B := Vector(n, [ seq( (-subs(map(v -> v=0, V), Eq[i])), i=1..n) ]);
+		return A,B
 	end proc:
 
 polcheckSol:= proc(Sol::Or(list,set),
@@ -1120,7 +1136,7 @@ polcheckSol:= proc(Sol::Or(list,set),
 	local S::list, ADE::algebraic, i::nonnegint,
 	      checkADE::algebraic, deg::extended_numeric;
 	option `Copyright (c) 2022 Bertrand Teguia T.`;
-	S:=map(simplify,Sol);
+	S:=map(normal,Sol);
 	ADE:=subs(S,ADEsol);
 	checkADE:=expand(eval(ADE,y(x)=Lf));
 	deg:= ldegree(checkADE,x);
@@ -1138,10 +1154,10 @@ modpolcheckSol:= proc(Sol::Or(list,set),
 	local S::list, ADE::algebraic, i::nonnegint,
 	      checkADE::algebraic, deg::extended_numeric;
 	option `Copyright (c) 2022 Bertrand Teguia T.`;
-	S:=map(simplify,Sol);
+	S:=map(normal,Sol);
 	ADE:=subs(S,ADEsol);
-	checkADE:=expand(eval(ADE,y(x)=Lf)) mod m;
-	#checkADE:=expand(checkADE) mod m;
+	checkADE:=eval(ADE,y(x)=Lf) mod m;
+	checkADE:=Expand(checkADE) mod m;
 	deg:= ldegree(checkADE,x);
 	return ADE, S, evalb(checkADE=0 or deg>=nL-PDEtools:-difforder(ADE,x))
 end proc:
@@ -1157,10 +1173,10 @@ checkSol:= proc(Sol::Or(list,set),
 		  $)
 	local S::list, RE::algebraic, checkL::list, checkset::set,i::nonnegint;
 	option `Copyright (c) 2022 Bertrand Teguia T.`;
-	S:=map(simplify,Sol);
+	S:=map(normal,Sol);
 	RE:=subs(S,REsol);
 	checkL:=[op(NegInd),op(Sinit)];
-	checkset:={seq(simplify(subs(checkL,eval(RE,[n=i,Sum=add]))),i=(nL-numelems(Sol)-1)..nL)};
+	checkset:={seq(normal(subs(checkL,eval(RE,[n=i,Sum=add]))),i=(nL-numelems(Sol)-1)..nL)};
 	checkset:=remove(has,checkset,a);
 	return RE, S, evalb(checkset in {{0},{}})
 end proc:
@@ -1177,10 +1193,10 @@ modcheckSol:= proc(Sol::Or(list,set),
 		     $)
 	local S::list, RE::algebraic, checkL::list, checkset::set,i::nonnegint;
 	option `Copyright (c) 2022 Bertrand Teguia T.`;
-	S:=map(simplify,Sol);
+	S:=map(normal,Sol);
 	RE:=subs(S,REsol);
 	checkL:=[op(NegInd),op(Sinit)];
-	checkset:={seq(simplify(subs(checkL,eval(RE,[n=i,Sum=add]) mod m) mod m),i=(nL-numelems(Sol)-1)..nL)};
+	checkset:={seq(normal(subs(checkL,eval(RE,[n=i,Sum=add]) mod m) mod m),i=(nL-numelems(Sol)-1)..nL)};
 	checkset:=remove(has,checkset,a);
 	return RE, S, evalb(checkset in {{0},{}})
 end proc:
