@@ -22,7 +22,7 @@ DalgFunGuess:= proc(L::list,
 	 maxIteration::Or(posint,identical(infinity)):=infinity,
 	     approach::identical(recurrence,polynomialsubs):=polynomialsubs,
        inputConstants::set(name):={},
-	    linsolver::identical(AlgebraicFunction,Rational,AlgebraicNumber,RadicalFunction,RationalDense,HardSystem):=AlgebraicFunction},
+	    linsolver::identical(AlgebraicFunction,Rational,AlgebraicNumber,RadicalFunction,RationalDense,HardSystem):=HardSystem},
 		   $)::Or(identical(FAIL),`=`,list(`=`));
 		option `Copyright (c) 2025 Bertrand Teguia T.`;
 		description "Guessing D-algebraic functions (finding their differential equations)";
