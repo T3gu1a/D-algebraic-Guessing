@@ -19,7 +19,7 @@ The package currently exports two commands for recovering D-algebraic functions 
 
 We randomly generated several lists of initial terms of series solutions to dense linear differential equations with polynomial coefficients. The ODEs are of order $r$ with polynomial coefficients of degree $r-d$, for $r=1,\ldots,30$. The initial values are integers selected from the interval $[0,100]$. We used our implementations alongside [Gfun:-listtodiffeq](https://perso.ens-lyon.fr/bruno.salvy/software/the-gfun-package/) (version 4.18, March 2026) to recover the differential equations from the lists, and we plotted the CPU time of each computation against the order. For a given order $r$ and degree $d$, we generated $10$ lists of initial terms, and took the average of the timings of each implementation. The generated data and the code to generate similar ones are available in the benchmarks folder.
 
-![Order 1 to order 6](/benchmarks/OrderUpTo30/plotResults_DalgGuessing_and_Gfun.png)
+![Order 1 to order 6](/benchmarks/OrderUpTo30/plotResults_DalgGuessing_and_Gfun.png)![Order 1 to order 30](/benchmarks/OrderUpTo30/plotr0tor6_DalgGuessing_and_Gfun.png)
 
 *Plot of CPU time against order. For the modular computations, the prime 1113 was used. A lower curve indicates a faster implementation.*
 
