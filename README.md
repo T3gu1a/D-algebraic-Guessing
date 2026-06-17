@@ -2,8 +2,6 @@
 
 [![arXiv](https://img.shields.io/badge/arXiv-2510.26869-red.svg)](https://arxiv.org/abs/2510.26869)
 
-> «The result of the mathematician's creative work is demonstrative reasoning, a proof, but the proof is discovered by plausible reasoning, by GUESSING.» — George Pólya
-
 <!-- ![Order 4 to order 12](/benchmarks/OrderUpTo30/plotr4tor12_DalgGuessing_and_Gfun.png) ![Order 1 to order 30](/benchmarks/OrderUpTo30/plotr0tor6_DalgGuessing_and_Gfun.png)-->
 <!-- ![Analogy](/images/Analogy.png)*The young fisherman caught a 'necklace' of consecutive terms of a sequence, providing strong evidence that this sequence belongs to a class of objects defined by its 'fishing rod' (being D-algebraic).* -->
 
@@ -72,3 +70,5 @@ Except for the `linsolver` argument, `modDalgFunGuess` shares the same arguments
 ## Author
 
 - [Bertrand Teguia Tabuguia](https://bertrandteguia.com), [Email Me](mailto:email@bertrandteguia.com)
+
+> «The result of the mathematician's creative work is demonstrative reasoning, a proof, but the proof is discovered by plausible reasoning, by GUESSING.» — George Pólya
