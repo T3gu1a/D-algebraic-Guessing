@@ -4,8 +4,8 @@
 
 > «The result of the mathematician's creative work is demonstrative reasoning, a proof, but the proof is discovered by plausible reasoning, by GUESSING.» — George Pólya
 
-![Analogy](/images/Analogy.png)
-*The young fisherman caught a 'necklace' of consecutive terms of a sequence, providing strong evidence that this sequence belongs to a class of objects defined by its 'fishing rod' (being D-algebraic).*
+<!-- ![Order 4 to order 12](/benchmarks/OrderUpTo30/plotr4tor12_DalgGuessing_and_Gfun.png) ![Order 1 to order 30](/benchmarks/OrderUpTo30/plotr0tor6_DalgGuessing_and_Gfun.png)-->
+<!-- ![Analogy](/images/Analogy.png)*The young fisherman caught a 'necklace' of consecutive terms of a sequence, providing strong evidence that this sequence belongs to a class of objects defined by its 'fishing rod' (being D-algebraic).* -->
 
 ## Introduction
 
@@ -16,6 +16,14 @@ The package currently exports two commands for recovering D-algebraic functions 
 
 - ``DalgFunGuess`` : guess an algebraic differential equation in characteristic zero from a list of initial coefficients of the D-algebraic function sought.
 - ``modDalgFunGuess``: guess an algebraic differential equation over $\mathbb{Z} /m \mathbb{Z}$ from a list of initial coefficients of the D-algebraic function sought. Here $m$ is a positive integer (usually prime) chosen by the user.
+
+We randomly generated several lists of initial terms of series solutions to dense linear differential equations with polynomial coefficients. The ODEs are of order $r$ with polynomial coefficients of degree $r-d$, for $r=1,\ldots,30$. The initial values are integers selected from the interval $[0,100]$. We used our implementations alongside [Gfun:-listtodiffeq](https://perso.ens-lyon.fr/bruno.salvy/software/the-gfun-package/) (version 4.18, March 2026) to recover the differential equations from the lists, and we plotted the CPU time of each computation against the order. For a given order $r$ and degree $d$, we generated $10$ lists of initial terms, and took the average of the timings of each implementation. The generated data and the code to generate similar ones are available in the benchmarks folder.
+
+![Order 1 to order 6](/benchmarks/OrderUpTo30/plotResults_DalgGuessing_and_Gfun.png)
+
+*Plot of CPU time against order. For the modular computations, the prime 1113 was used. A lower curve indicates a faster implementation.*
+
+Detailed discussion and analysis will be provided in the accompanying software paper (accepted for ISSAC 2026), which will appear on arXiv soon. The purpose of this demonstration is to highlight the potential of our implementation for recovering algebraic ODEs. A performance comparison with the implementation from the [FriCAS](https://fricas.github.io/fricas-notebooks/index.html) computer algebra system will also be presented.
 
 
 ## Requirements
