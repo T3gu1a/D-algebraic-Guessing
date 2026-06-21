@@ -18,7 +18,7 @@ We randomly generated several lists of initial terms of series solutions to dens
 
 ![Order 1 to order 6](/benchmarks/OrderUpTo30/plotResults_DalgGuessing_and_Gfun.png)![Order 1 to order 30](/benchmarks/OrderUpTo30/plotr0tor6_DalgGuessing_and_Gfun.png)
 
-*Plot of CPU time against order. For the modular computations, the prime 1113 was used. A lower curve indicates a faster implementation.*
+*Plot of CPU time against order. For the modular computations, the prime 11113 was used. A lower curve indicates a faster implementation.*
 
 Detailed discussion and analysis will be provided in the accompanying software paper (accepted for ISSAC 2026), which will appear on arXiv soon. The purpose of this demonstration is to highlight the potential of our implementation for recovering algebraic ODEs. A performance comparison with the implementation from the [FriCAS](https://fricas.github.io/fricas-notebooks/index.html) computer algebra system will also be presented.
 
